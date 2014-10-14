@@ -5,9 +5,6 @@
   "license": "MIT",
   "homepage": "http://wagerfield.github.io/parallax/",
   "author": "Matthew Wagerfield <matthew@wagerfield.com>",
-  "directories": {
-    "example": "examples"
-  },
   "scripts": {
     "build": "gulp"
   },
