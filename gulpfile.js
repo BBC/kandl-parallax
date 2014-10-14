@@ -20,20 +20,12 @@ gulp.task('build.parallax', function() {
     ]), 'parallax.js');
 });
 
-gulp.task('build.jquery.parallax', function() {
-  return build(gulp.src([
-      'LICENSE',
-      'source/jquery.parallax.js',
-      'source/requestAnimationFrame.js'
-    ]), 'jquery.parallax.js');
-});
-
 gulp.task('clean', function() {
   return gulp.src(['deploy'], {read: false}).pipe(plugins.clean());
 });
 
 gulp.task('build', ['clean'], function() {
-  gulp.start('build.parallax', 'build.jquery.parallax');
+  gulp.start('build.parallax');
 });
 
 gulp.task('watch', function() {
