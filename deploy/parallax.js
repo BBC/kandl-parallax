@@ -36,7 +36,8 @@
  *              driving the motion from the gyroscope output of a smartdevice.
  *              If no gyroscope is available, the cursor position is used.
  */
-;(function(window, document, undefined) {
+
+define(function() {
 
   // Strict Mode
   'use strict';
@@ -64,11 +65,11 @@
     originY: 0.5
   };
 
-  function Parallax(element, options) {
+  function Parallax(element, layer, options) {
 
     // DOM Context
     this.element = element;
-    this.layers = element.getElementsByClassName('layer');
+    this.layer = layer;
 
     // Data Extraction
     var data = {
@@ -98,7 +99,6 @@
     this.calibrationTimer = null;
     this.calibrationFlag = true;
     this.enabled = false;
-    this.depths = [];
     this.raf = null;
 
     // Element Bounds
@@ -239,8 +239,8 @@
   Parallax.prototype.motionSupport = !!window.DeviceMotionEvent;
   Parallax.prototype.orientationSupport = !!window.DeviceOrientationEvent;
   Parallax.prototype.orientationStatus = 0;
-  Parallax.prototype.transform2DSupport = Parallax.prototype.transformSupport('2D');
-  Parallax.prototype.transform3DSupport = Parallax.prototype.transformSupport('3D');
+  Parallax.prototype.transform2DSupport = false;
+  Parallax.prototype.transform3DSupport = false;
   Parallax.prototype.propertyCache = {};
 
   Parallax.prototype.initialise = function() {
@@ -261,22 +261,13 @@
 
   Parallax.prototype.updateLayers = function() {
 
-    // Cache Layer Elements
-    this.layers = this.element.getElementsByClassName('layer');
-    this.depths = [];
-
     // Configure Layer Styles
-    for (var i = 0, l = this.layers.length; i < l; i++) {
-      var layer = this.layers[i];
-      if (this.transform3DSupport) this.accelerate(layer);
-      layer.style.position = i ? 'absolute' : 'relative';
-      layer.style.display = 'block';
-      layer.style.left = 0;
-      layer.style.top = 0;
-
-      // Cache Layer Depth
-      this.depths.push(this.data(layer, 'depth') || 0);
-    }
+    this.layer.style.position = 'relative';
+    this.layer.style.display = 'block';
+    this.layer.style.left = 0;
+    this.layer.style.top = 0;
+    // Cache Layer Depth
+    this.backgroundDepth = this.data(this.layer, 'depth');
   };
 
   Parallax.prototype.updateDimensions = function() {
@@ -286,6 +277,9 @@
     this.wcy = this.wh * this.originY;
     this.wrx = Math.max(this.wcx, this.ww - this.wcx);
     this.wry = Math.max(this.wcy, this.wh - this.wcy);
+
+    this.sizeDifferenceX = (this.layer.offsetWidth * 1.1 - this.layer.offsetWidth) / 2;
+    this.sizeDifferenceY = (this.layer.offsetHeight * 1.1 - this.layer.offsetHeight) / 2;
   };
 
   Parallax.prototype.updateBounds = function() {
@@ -390,23 +384,14 @@
     element.style[jsProperty] = value;
   };
 
-  Parallax.prototype.accelerate = function(element) {
-    this.css(element, 'transform', 'translate3d(0,0,0)');
-    this.css(element, 'transform-style', 'preserve-3d');
-    this.css(element, 'backface-visibility', 'hidden');
-  };
-
   Parallax.prototype.setPosition = function(element, x, y) {
+    x = x - this.sizeDifferenceX;
+    y = y - this.sizeDifferenceY;
     x += 'px';
     y += 'px';
-    if (this.transform3DSupport) {
-      this.css(element, 'transform', 'translate3d('+x+','+y+',0)');
-    } else if (this.transform2DSupport) {
-      this.css(element, 'transform', 'translate('+x+','+y+')');
-    } else {
-      element.style.left = x;
-      element.style.top = y;
-    }
+
+    element.style.left = x;
+    element.style.top = y;
   };
 
   Parallax.prototype.onOrientationTimer = function(event) {
@@ -449,13 +434,10 @@
     }
     this.vx += (this.mx - this.vx) * this.frictionX;
     this.vy += (this.my - this.vy) * this.frictionY;
-    for (var i = 0, l = this.layers.length; i < l; i++) {
-      var layer = this.layers[i];
-      var depth = this.depths[i];
-      var xOffset = this.vx * depth * (this.invertX ? -1 : 1);
-      var yOffset = this.vy * depth * (this.invertY ? -1 : 1);
-      this.setPosition(layer, xOffset, yOffset);
-    }
+
+    var xOffset = this.vx * this.backgroundDepth * (this.invertX ? -1 : 1);
+    var yOffset = this.vy * this.backgroundDepth * (this.invertY ? -1 : 1);
+    this.setPosition(this.layer, xOffset, yOffset);
     this.raf = requestAnimationFrame(this.onAnimationFrame);
   };
 
@@ -520,10 +502,9 @@
     }
   };
 
-  // Expose Parallax
-  window[NAME] = Parallax;
+  return Parallax;
 
-})(window, document);
+});
 
 /**
  * Request Animation Frame Polyfill.
