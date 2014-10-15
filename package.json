@@ -1,7 +1,7 @@
 {
   "name": "kandl-parallax",
   "description": "Parallax engine based on parallaxjs",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "license": "MIT",
   "homepage": "http://wagerfield.github.io/parallax/",
   "author": "Matthew Wagerfield <matthew@wagerfield.com>",

@@ -14,6 +14,7 @@ define(function () {
     // Constants
     var NAME = 'Parallax';
     var MAGIC_NUMBER = 30;
+    var MAGIC_LIMITER = 2.5;
     var DEFAULTS = {
         relativeInput: false,
         clipRelativeInput: false,
@@ -358,8 +359,11 @@ define(function () {
     };
 
     Parallax.prototype.setPosition = function (element, x, y) {
-        element.style.left = x - this.sizeDifferenceX + 'px';
-        element.style.top = y - this.sizeDifferenceY + 'px';
+        var nx = Math.max(-this.sizeDifferenceX + MAGIC_LIMITER, Math.min(this.sizeDifferenceX, x));
+        var ny = Math.max(-this.sizeDifferenceY, Math.min(this.sizeDifferenceY, y));
+
+        element.style.left = nx - this.sizeDifferenceX + 'px';
+        element.style.top = ny - this.sizeDifferenceY + 'px';
     };
 
     Parallax.prototype.onOrientationTimer = function (event) {
