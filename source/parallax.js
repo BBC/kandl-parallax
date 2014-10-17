@@ -14,6 +14,7 @@ define(function () {
     // Constants
     var NAME = 'Parallax';
     var MAGIC_NUMBER = 30;
+    var MAGIC_PERCENT = 2.2;
 
     var DEFAULTS = {
         relativeInput: false,
@@ -252,8 +253,8 @@ define(function () {
         this.wrx = Math.max(this.wcx, this.ww - this.wcx);
         this.wry = Math.max(this.wcy, this.wh - this.wcy);
 
-        this.sizeDifferenceX = Math.floor((this.layer.offsetWidth * this.scale - this.layer.offsetWidth) / 2.2);
-        this.sizeDifferenceY = Math.floor((this.layer.offsetHeight * this.scale - this.layer.offsetHeight) / 2.2);
+        this.sizeDifferenceX = Math.floor((this.layer.offsetWidth * this.scale - this.layer.offsetWidth) / MAGIC_PERCENT);
+        this.sizeDifferenceY = Math.floor((this.layer.offsetHeight * this.scale - this.layer.offsetHeight) / MAGIC_PERCENT);
     };
 
     Parallax.prototype.updateBounds = function () {
