@@ -1,5 +1,6 @@
 var gulp = require('gulp'),
-    plugins = require("gulp-load-plugins")();
+    plugins = require("gulp-load-plugins")(),
+    bump = require('gulp-bump');
 
 function build(stream, file) {
   return stream
@@ -32,4 +33,10 @@ gulp.task('watch', function() {
   gulp.watch('source/**/*.js', ['build']);
 });
 
-gulp.task('default', ['build']);
+gulp.task('bump', function(){
+    gulp.src('./package.json')
+        .pipe(bump({type:'patch'}))
+        .pipe(gulp.dest('./'));
+});
+
+gulp.task('default', ['build', 'bump']);
