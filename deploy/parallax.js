@@ -45,7 +45,8 @@ define(function () {
     // Constants
     var NAME = 'Parallax';
     var MAGIC_NUMBER = 30;
-    var MAGIC_LIMITER = 2.5;
+    var MAGIC_PERCENT = 2.2;
+
     var DEFAULTS = {
         relativeInput: false,
         clipRelativeInput: false,
@@ -283,8 +284,8 @@ define(function () {
         this.wrx = Math.max(this.wcx, this.ww - this.wcx);
         this.wry = Math.max(this.wcy, this.wh - this.wcy);
 
-        this.sizeDifferenceX = (this.layer.offsetWidth * 1.1 - this.layer.offsetWidth) / 2;
-        this.sizeDifferenceY = (this.layer.offsetHeight * 1.1 - this.layer.offsetHeight) / 2;
+        this.sizeDifferenceX = Math.floor((this.layer.offsetWidth * this.scale - this.layer.offsetWidth) / MAGIC_PERCENT);
+        this.sizeDifferenceY = Math.floor((this.layer.offsetHeight * this.scale - this.layer.offsetHeight) / MAGIC_PERCENT);
     };
 
     Parallax.prototype.updateBounds = function () {
@@ -390,8 +391,8 @@ define(function () {
     };
 
     Parallax.prototype.setPosition = function (element, x, y) {
-        var nx = Math.max(-this.sizeDifferenceX + MAGIC_LIMITER, Math.min(this.sizeDifferenceX, x));
-        var ny = Math.max(-this.sizeDifferenceY, Math.min(this.sizeDifferenceY, y));
+        var nx = this.clamp(x, -this.sizeDifferenceX, this.sizeDifferenceX);
+        var ny = this.clamp(y, -this.sizeDifferenceY, this.sizeDifferenceY);
 
         element.style.left = nx - this.sizeDifferenceX + 'px';
         element.style.top = ny - this.sizeDifferenceY + 'px';
